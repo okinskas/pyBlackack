@@ -15,6 +15,9 @@ class Card(object):
     def get_suit(self):
         return self.suit
 
+    def get_key(self):
+        return self.rank[0]
+
     def get_value(self):
         return self.rank[1]
 
@@ -39,10 +42,11 @@ class Deck(object):
         return card
 
 class Hand(object):
+    # implement preserve order for printing purposes
 
     def __init__(self, cards):
         self.cards = cards
-        self.handled = False
+        self.finished = False
         self.doubled_down = False
 
     def __str__(self):
@@ -68,17 +72,23 @@ class Hand(object):
     def has_doubled_down(self):
         return self.doubled_down
 
-    def finish(self):
-        self.handled = True
-
     def has_finished(self):
-        return self.handled
+        return self.finished
 
     def clear_hand(self):
         self.cards = []
 
     def can_split(self):
-        return self.cards[0].get_suit() == self.cards[1].get_suit()
+        return self.cards[0].get_key() == self.cards[1].get_key()
+
+    def is_blackjack(self):
+        cards = self.cards
+        if len(cards) == 2:
+            has_ace = ("Ace", 11) in cards 
+            has_value_10 = ('Jack',10) in cards or ('Queen',10) in cards or ('King',10) in cards
+            return has_ace and has_value_10
+        else:
+            return False
 
     def calc_total(self, total=0, n=0): # likely still wrong
         if (n >= len(self.cards)):
@@ -100,7 +110,7 @@ class Player(object):
 
     def __str__(self):
         out = self.name + ": "
-        out += str(self.hand_main)
+        out += str(self.hand_main) + "\n"
         out += str(self.hand_split)
         return out + "\n"
 
@@ -123,8 +133,19 @@ class Dealer(Player):
     def show_one(self):
         return self.name + ": " + str(self.hand_main.get_hand()[0])
 
-    def choice(self):
-        return self.hand_main.calc_total() < 17
+    def choice(self, player):
+        dealer_hand = self.hand_main
+        player_hand1 = player.hand_main.calc_total()
+        player_hand2 = 0
+
+        if player.hand_split != None:
+            player_hand2 = player_hand2.calc_total()
+        if player_hand1 > 21 and player_hand2 > 21:
+            return False
+        else:
+            # hit on < 17 or is soft-seventeen
+            is_soft_seventeen = dealer_hand.calc_total() == 17 and ('Ace',11) in dealer_hand.get_hand()
+            return dealer_hand.calc_total() < 17 or is_soft_seventeen
 
 class Game(object):
 
@@ -144,7 +165,6 @@ class Game(object):
         self.player.hand_main.add_card(self.deck.get_card())
         self.player.hand_main.add_card(self.deck.get_card())
 
-# change all below to work with main/split hands
     def hit(self, hand):
         hand.add_card(self.deck.get_card())
 
@@ -159,10 +179,11 @@ class Game(object):
 
     def player_cycle(self, hand):
         while True:
-            print(str(self.player))
+            # add check for blackjack prior to input
+            print(str(hand))
             choice = input("What do you do?\n").lower()
             if choice == "stick":
-                hand.finish()
+                hand.finished = True
                 break
             elif choice == "hit":
                 hand.add_card(self.deck.get_card())
@@ -175,7 +196,7 @@ class Game(object):
                     print("You cannot split this hand.\n")
                 else:
                     break
-            elif choice == "double down" or "dd":
+            elif choice == "double down" or choice == "dd":
                 hand.add_card(self.deck.get_card())
                 hand.has_doubled_down = True
                 hand.finish()
@@ -188,12 +209,12 @@ class Game(object):
     def dealer_cycle(self):
         while True:
             print(str(self.dealer))
-            if self.dealer.choice():
+            if self.dealer.choice(self.player):
                 self.dealer.hand_main.add_card(self.deck.get_card())
                 continue
             break
     
-    def play(self): # need to prevent dealer from playing if other hands are bust already
+    def play(self):
         self.player_cycle(self.player.hand_main)
         if not self.player.hand_main.has_finished():
             self.player_cycle(self.player.hand_main)
@@ -228,9 +249,6 @@ class Controller(object):
         game.setup_deal()
         game.play()
 
-# account for earlier ace in calculation -> solved, hands are now ordered, moved calc total to hand
-# change game to account for multiple hands per player
-# need to add split option, will mean increasing the number of hands ^
 # add betting
 # add double down
 if __name__ == "__main__":
