@@ -43,11 +43,12 @@ class Deck(object):
 
 class Hand(object):
     # implement preserve order for printing purposes
-
+    # for some reason cards=[] is not working, setting manually on creation while I figure it out
     def __init__(self, cards):
         self.cards = cards
-        self.finished = False
-        self.doubled_down = False
+        self.stake = 0
+        self.has_finished = False
+        self.has_doubled_down = False
 
     def __str__(self):
         out = ""
@@ -67,13 +68,15 @@ class Hand(object):
         return self.cards
 
     def split_hand(self):
-        return Hand(self.cards[0]), Hand(self.cards[1])
+        hand1 = Hand([self.cards[0]])
+        hand1.stake = self.stake
+        hand2 = Hand([self.cards[1]])
+        hand2.stake = self.stake
+        return hand1, hand2
 
-    def has_doubled_down(self):
-        return self.doubled_down
-
-    def has_finished(self):
-        return self.finished
+    def double_down(self):
+        self.stake *= 2
+        self.has_doubled_down = True
 
     def clear_hand(self):
         self.cards = []
@@ -130,6 +133,11 @@ class Dealer(Player):
     def __init__(self):
         Player.__init__(self, "Dealer")
 
+    def __str__(self):
+        out = self.name + ": "
+        out += str(self.hand_main) + "\n"
+        return out + "\n"
+
     def show_one(self):
         return self.name + ": " + str(self.hand_main.get_hand()[0])
 
@@ -183,13 +191,13 @@ class Game(object):
             print(str(hand))
             choice = input("What do you do?\n").lower()
             if choice == "stick":
-                hand.finished = True
+                hand.has_finished = True
                 break
             elif choice == "hit":
                 hand.add_card(self.deck.get_card())
                 if hand.calc_total() >= 21:
                     print(str(hand))
-                    hand.finish()
+                    hand.has_finished = True
                     break
             elif choice == "split":
                 if not self.player.split():
@@ -199,7 +207,7 @@ class Game(object):
             elif choice == "double down" or choice == "dd":
                 hand.add_card(self.deck.get_card())
                 hand.has_doubled_down = True
-                hand.finish()
+                hand.has_finished = True
                 break
             elif choice == "quit":
                 SystemExit
@@ -216,15 +224,23 @@ class Game(object):
     
     def play(self):
         self.player_cycle(self.player.hand_main)
-        if not self.player.hand_main.has_finished():
+        if not self.player.hand_main.has_finished:
             self.player_cycle(self.player.hand_main)
+
         player_total1 = self.player.hand_main.calc_total()
-        player_total2 = None
+        is_blackjack1 = self.player.hand_main.is_blackjack()
+
+        player_total2 = 0
+        is_blackjack2 = False
+        
         if self.player.hand_split != None:
             self.player_cycle(self.player.hand_split)
             player_total2 = self.player.hand_split.calc_total()
-        if player_total1 < 21 or (player_total2 != None and player_total2 < 21):
+            is_blackjack2 = self.player.hand_split.is_blackjack()
+        
+        if not ((is_blackjack1 or player_total1 > 21) and (is_blackjack2 or player_total2 > 21)):
             self.dealer_cycle()
+
         self.calc_winner()
 
     def calc_winner(self): # need to check split hand and account for blackjack
