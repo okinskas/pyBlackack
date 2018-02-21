@@ -1,7 +1,8 @@
 import blackjack as bj
 
+# Ensuring calculation of hand is correct when accounting for aces.
 def calc_test():
-    hand = bj.Hand([])
+    hand = bj.Hand()
 
     c1 = bj.Card((('Ace', 11), 'Clubs'))
     c2 = bj.Card((('Ace', 11), 'Diamonds'))
@@ -17,7 +18,7 @@ def calc_test():
     print(total)
 
     return total == 14
-         
+
 
 if __name__ == "__main__":
     calc_test()
