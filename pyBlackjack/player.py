@@ -1,5 +1,4 @@
 from pyBlackjack.hand import Hand
-import pyBlackjack.operations as ops
 
 
 class Player(object):
@@ -25,12 +24,6 @@ class Player(object):
     @property
     def hand_alt(self):
         return self._hand_alt
-
-    def split(self):
-        main, alt = ops.split_hand(self._hand)
-        if main is not None:
-            self._hand, self._hand_alt = main, alt
-            self._stack -= 10
 
     def reset(self):
         self._hand = Hand()

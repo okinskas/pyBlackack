@@ -15,6 +15,9 @@ class Dealer(object):
     def hand(self):
         return self._hand
 
+    def reset(self):
+        self._player.reset()  # double check this behaviour
+
     def choice(self):
 
         total = logic.aggregate(self._hand)

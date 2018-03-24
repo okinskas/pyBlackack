@@ -1,6 +1,7 @@
 from pyBlackjack.player import Player
 from pyBlackjack.dealer import Dealer
 from pyBlackjack.deck import Deck
+import pyBlackjack.operations as ops
 
 
 class Game(object):
@@ -9,104 +10,41 @@ class Game(object):
         self.player = Player(name)
         self.dealer = Dealer()
         self.deck = Deck()
-        self.turn_token = (1, 0)
-
-    def get_turn_hand(self):
-        if self.turn_token == (0, 0):
-            return self.dealer.hand_main
-        elif self.turn_token == (1, 0):
-            return self.player.hand_main
-        else:
-            return self.player.hand_alt
+        self.deck.shuffle()
 
     def reset(self):
-        self.player.reset_hands()
-        self.dealer.reset_hands()
+        self.player.reset()
+        self.dealer.reset()
         self.deck = Deck()
+        self.deck.shuffle()
 
-    def setup_deal(self):
+    def deal_round(self):
         self.reset()
-        if self.player.stack >= 10:
-            self.dealer.hand_main.add_card(self.deck.get_card())
-            self.dealer.hand_main.add_card(self.deck.get_card())
-            self.player.hand_main.add_card(self.deck.get_card())
-            self.player.hand_main.add_card(self.deck.get_card())
-            self.player.stack -= 10
-            return True
-        else:
+        if not ops.bet(self.player, self.player.hand):
             return False
-
-    def move_turn(self):
-        if self.turn_token == (0, 0):
-            self.turn_token = (1, 0)
-        elif self.turn_token == (1, 0) and self.player.has_split():
-            self.turn_token = (1, 1)
         else:
-            self.turn_token = (0, 0)
+            ops.hit(self.player.hand, self.deck)
+            ops.hit(self.dealer.hand, self.deck)
+
+            ops.hit(self.player.hand, self.deck)
+            ops.hit(self.dealer.hand, self.deck)
+            return True
+
+    def hit(self, hand):
+        ops.hit(hand, self.deck)
 
     def split(self):
-        if self.turn_token == (1, 0):
-            if self.player.split():
-                self.player.hand_main.add_card(self.deck.get_card())
-                self.player.stack -= 10
-                self.player.hand_alt.add_card(self.deck.get_card())
-                return True
-        return False
+        return ops.split(self.player)
 
-    def hit(self):
-        hand = self.get_turn_hand()
-        if hand.is_finished:
-            return False
-        if hand.is_blackjack():
-            hand.finish()
-            self.move_turn()
-            return False
+    def stick(self, hand):
+        ops.stick(hand)
 
-        hand.add_card(self.deck.get_card())
-
-        if hand.is_bust():
-            hand.finish()
-            self.move_turn()
-            return False
-        else:
-            return True
-
-    def stick(self):
-        hand = self.get_turn_hand()
-        hand.finish()
-        self.move_turn()
-
-    def double_down(self):
-        hand = self.get_turn_hand()
-        x, y = self.turn_token
-        if x == 1 and not hand.is_finished:
-            self.player.stack -= hand.stake
-            hand.double_down()
-            self.hit()
-            return True
-        return False
-
-    def is_winner(self, hand):
-        dealer_total = self.dealer.hand_main.calc_total()
-        total = hand.calc_total()
-        if total == dealer_total:
-            return None
-        return 21 >= total > dealer_total
+    def double_down(self, player, hand):
+        return ops.double_down(player, hand)
 
     def end_round(self):
-        player_hands = [self.player.hand_main]
-        if self.player.hand_alt is not None:
-            player_hands.append(self.player.hand_alt)
-
-        for hand in player_hands:
-            try:
-                if self.is_winner(hand):
-                    self.player.stack += hand.stake * 2
-            except None:
-                self.player.stack += hand.stake
-
-        if self.player.stack < 0:
-            quit()
+        ops.reward(self.player, self.dealer)
+        self.reset()
 
 # w/o interface, sequence should be as follows:
 
@@ -116,5 +54,3 @@ class Game(object):
 # dealer actions
 # calculate winner + distribute bets
 # deal new hands (initialise deck)
-
-
