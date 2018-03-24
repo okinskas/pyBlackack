@@ -1,22 +1,21 @@
 import random
-from pyBlackjack.card import Card
+import pyBlackjack.cards as Cards
+from pyBlackjack.cards import Card
+
 
 class Deck(object):
 
     def __init__(self):
-        self.cards = []
-        for suit in Card.suits:
-            for rank in Card.ranks:
-                self.cards.append(Card((rank, suit)))
+        self._cards = []
+        for suit in Cards.SUITS:
+            for rank in Cards.RANKS:
+                self._cards.append(Card(rank, suit))
 
-    def __str__(self):
-        return str(self.cards)
+    def cards(self):
+        return self._cards
 
-    def remove(self, index):
-        del self.cards[index] # check this is correct...
+    def shuffle(self):
+        self._cards = random.shuffle(self._cards)
 
-    def get_card(self):
-        position = random.randint(0, len(self.cards) - 1)
-        card = self.cards[position] # check this is correct
-        self.remove(position)
-        return card
+    def draw(self):
+        return self._cards.pop()

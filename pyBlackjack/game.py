@@ -3,7 +3,6 @@ from pyBlackjack.dealer import Dealer
 from pyBlackjack.deck import Deck
 
 
-# standard game actions
 class Game(object):
 
     def __init__(self, name):
