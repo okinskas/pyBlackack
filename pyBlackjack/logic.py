@@ -12,8 +12,9 @@ def value(card):
         return int(r)
 
 
-def is_blackjack(cards):
+def is_blackjack(hand):
 
+    cards = hand.cards
     if len(cards) == 2:
         ranks = [x.rank for x in cards]
         has_ace = c.ACE in ranks
@@ -23,17 +24,30 @@ def is_blackjack(cards):
         return False
 
 
-def aggregate(cards, total=0, n=0, ace_count=0):
+def aggregate(hand, total=0, n=0, ace_count=0):
 
-    if n == len(cards):
+    if n == len(hand.cards):
         return total
-    if cards[n].rank == c.ACE:
+    if hand.cards[n].rank == c.ACE:
         ace_count += 1
 
-    total += value(cards[n])
+    total += value(hand.cards[n])
 
     if total > 21 and ace_count > 0:
         total -= 10
         ace_count -= 1
 
-    return aggregate(cards, total, n + 1, ace_count)
+    return aggregate(hand.cards, total, n + 1, ace_count)
+
+
+def hand_wins(hand, dealer):
+
+    p = aggregate(hand)
+    d = aggregate(dealer.hand_main)
+
+    if p > 21:
+        return dealer
+    elif d < p <= 21:
+        return p
+    else:
+        return None

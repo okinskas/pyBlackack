@@ -1,26 +1,26 @@
 from pyBlackjack.player import Player
+import pyBlackjack.logic as logic
+import pyBlackjack.cards as c
+
+SOFT_SEVENTEEN_RULE = True
 
 
-class Dealer(Player):
+class Dealer(object):
 
     def __init__(self):
-        Player.__init__(self, "Dealer")
+        self._player = Player('Dealer')
+        self._hand = self._player.hand
 
-    def __str__(self):
-        out = self.name + ": "
-        out += str(self.hand_main) + "\n"
-        return out + "\n"
+    @property
+    def hand(self):
+        return self._hand
 
-    def choice(self, player):
-        dealer_hand = self.hand_main
-        player_hand1 = player.hand_main.calc_total()
-        player_hand2 = 0
+    def choice(self):
 
-        if player.hand_alt is not None:
-            player_hand2 = player.hand_alt.calc_total()
-        if player_hand1 > 21 and player_hand2 > 21:
-            return False
+        total = logic.aggregate(self._hand)
+        is_soft_seventeen = total == 17 and c.ACE in [x.rank for x in self._hand.cards]
+
+        if SOFT_SEVENTEEN_RULE:
+            return total < 17 or is_soft_seventeen
         else:
-            # hit on < 17 or is soft-seventeen
-            is_soft_seventeen = dealer_hand.calc_total() == 17 and ('Ace', 11) in dealer_hand.get_hand()
-            return dealer_hand.calc_total() < 17 or is_soft_seventeen
+            return total < 17
