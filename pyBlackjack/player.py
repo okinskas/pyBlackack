@@ -9,12 +9,6 @@ class Player(object):
         self.hand_main = Hand([])
         self.hand_alt = None
 
-    def __str__(self):
-        out = self.name + ": "
-        out += str(self.hand_main) + "\n"
-        out += str(self.hand_alt)
-        return out + "\n"
-
     def split(self):
         main, alt = self.hand_main.split()
         if main is None:

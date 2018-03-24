@@ -8,7 +8,8 @@ QUEEN = "Q"
 KING = "K"
 ACE = "A"
 
-RANKS = [str(n) for n in range(2, 11)] + [JACK, QUEEN, KING, ACE]
+FACE = [JACK, QUEEN, KING]
+RANKS = [str(n) for n in range(2, 11)] + FACE + [ACE]
 SUITS = [CLUB, DIAMOND, HEART, SPADE]
 
 
@@ -18,8 +19,10 @@ class Card(object):
         self._rank = rank
         self._suit = suit
 
+    @property
     def rank(self):
         return self._rank
 
+    @property
     def suit(self):
         return self._suit

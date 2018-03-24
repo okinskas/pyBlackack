@@ -11,6 +11,7 @@ class Deck(object):
             for rank in Cards.RANKS:
                 self._cards.append(Card(rank, suit))
 
+    @property
     def cards(self):
         return self._cards
 
