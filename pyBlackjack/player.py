@@ -7,7 +7,7 @@ class Player(object):
         self._name = name
         self._stack = 100
         self._hand = Hand([])
-        self._hand_alt = None
+        self._alt = None
 
     @property
     def name(self):
@@ -22,9 +22,9 @@ class Player(object):
         return self._hand
 
     @property
-    def hand_alt(self):
-        return self._hand_alt
+    def alt(self):
+        return self._alt
 
     def reset(self):
         self._hand = Hand()
-        self._hand_alt = None
+        self._alt = None

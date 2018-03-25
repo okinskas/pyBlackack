@@ -43,13 +43,13 @@ def split(player):
             return False
         else:
             player.hand = hand1
-            player.hand_alt = hand2
+            player.alt = hand2
     else:
         return False
 
 
 def reward(player, dealer):
-    hands = [h for h in [player.hand, player.hand_alt] if h is not None]
+    hands = [h for h in [player.hand, player.alt] if h is not None]
 
     for hand in hands:
         winner = logic.get_winner(hand, dealer)
