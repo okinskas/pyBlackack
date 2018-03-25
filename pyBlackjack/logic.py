@@ -25,7 +25,7 @@ def aggregate(hand, total=0, n=0, ace_count=0):
         total -= 10
         ace_count -= 1
 
-    return aggregate(hand.cards, total, n + 1, ace_count)
+    return aggregate(hand, total, n + 1, ace_count)
 
 
 def is_blackjack(hand):
@@ -40,7 +40,7 @@ def is_blackjack(hand):
         return False
 
 
-def is_bust(hand):
+def is_done(hand):
     return aggregate(hand) > 21
 
 
@@ -54,4 +54,4 @@ def get_winner(hand, dealer):
     elif d < p <= 21:
         return hand
     else:
-        return hand, dealer
+        return None

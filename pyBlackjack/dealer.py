@@ -12,6 +12,10 @@ class Dealer(object):
         self._hand = self._player.hand
 
     @property
+    def name(self):
+        return self._player.name
+
+    @property
     def hand(self):
         return self._hand
 

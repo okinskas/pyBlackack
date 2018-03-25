@@ -31,26 +31,25 @@ class Game(object):
             return True
 
     def hit(self, hand):
-        ops.hit(hand, self.deck)
+        return ops.hit(hand, self.deck)
 
     def split(self):
         return ops.split(self.player)
 
     def stick(self, hand):
         ops.stick(hand)
+        return True
 
     def double_down(self, player, hand):
-        return ops.double_down(player, hand)
+        return ops.double_down(player, hand, self.deck)
 
-    def end_round(self):
+    def dealer_turn(self):
+        hit = self.dealer.choice()
+        if hit:
+            return self.hit(self.dealer.hand)
+        else:
+            self.stick(self.dealer.hand)
+            return False
+
+    def reward(self):
         ops.reward(self.player, self.dealer)
-        self.reset()
-
-# w/o interface, sequence should be as follows:
-
-# create game - initialise player name and stacks
-# deal hands (initialise deck)
-# player actions
-# dealer actions
-# calculate winner + distribute bets
-# deal new hands (initialise deck)

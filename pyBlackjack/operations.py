@@ -14,10 +14,15 @@ def bet(player, hand, stake=10):
 
 def stick(hand):
     hand.finished = True
+    return "stick"
 
 
 def hit(hand, deck):
     hand.cards.append(deck.draw())
+    if logic.is_done(hand):
+        return "done"
+    else:
+        return True
 
 
 def double_down(player, hand, deck):
@@ -54,8 +59,7 @@ def reward(player, dealer):
     for hand in hands:
         winner = logic.get_winner(hand, dealer)
 
-        if winner is Hand:
+        if winner is hand:
             player.stack += winner.stake * 2
-        elif winner is (Hand, Dealer):
-            h, d = winner
-            player.stack += h.stake
+        elif winner is None:
+            player.stack += hand.stake
