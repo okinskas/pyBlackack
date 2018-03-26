@@ -2,6 +2,7 @@ from pyBlackjack.player import Player
 from pyBlackjack.dealer import Dealer
 from pyBlackjack.deck import Deck
 import pyBlackjack.operations as ops
+import pyBlackjack.logic as logic
 
 
 class Game(object):
@@ -44,7 +45,17 @@ class Game(object):
         return ops.double_down(player, hand, self.deck)
 
     def dealer_turn(self):
+        h1 = self.player.hand
+        h2 = None
+        if self.player.hand is not None:
+            h2 = self.player.hand
+
+        if logic.is_done(h1) and (h2 is None or logic.is_done(h2)):
+            self.stick(self.dealer.hand)
+            return False
+
         hit = self.dealer.choice()
+
         if hit:
             return self.hit(self.dealer.hand)
         else:

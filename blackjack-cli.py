@@ -52,7 +52,7 @@ class TextDisplay(object):
 
     def print_leave(self):
         p = self.game.player
-        print(p.name + " leaves with " + str(p.stack) + "chips.")
+        print(p.name + " leaves with " + str(p.stack) + " chips.")
 
 
 class Controller(object):
@@ -70,12 +70,15 @@ class Controller(object):
             self.end_round()
 
     def ask_to_start(self):
-        play = input("Start round? [y/n]\n")
+        while True:
+            play = input("Start round? [y/n]\n")
 
-        if play is "n":
-            self.leave_table()
-        else:
-            return True
+            if play is 'n':
+                self.leave_table()
+            elif play is 'y':
+                break
+            else:
+                print("Invalid action")
 
     def start_round(self):
         self.game.deal_round()
@@ -116,15 +119,15 @@ class Controller(object):
 
     def parse_player_input(self, msg, hand, player):
         msg = str(msg)
-        if msg in 'hit':
+        if 'hit' in msg:
             return self.game.hit(hand),
-        elif msg in 'stick':
+        elif 'stick' in msg:
             return self.game.stick(hand)
-        elif msg in 'split':
+        elif 'split' in msg:
             return self.game.split()
-        elif msg in 'dd':
+        elif 'dd' in msg:
             return self.game.double_down(player, hand)
-        elif msg in 'leave':
+        elif 'leave' in msg:
             return self.leave_table()
         else:
             return False
