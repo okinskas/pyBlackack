@@ -1,3 +1,4 @@
+from pyBlackjack.hand import Hand
 from pyBlackjack.player import Player
 import pyBlackjack.logic as logic
 import pyBlackjack.cards as c
@@ -20,7 +21,7 @@ class Dealer(object):
         return self._hand
 
     def reset(self):
-        self._player.reset()  # double check this behaviour
+        self._hand = Hand([])
 
     def choice(self):
 

@@ -78,7 +78,6 @@ class Controller(object):
             return True
 
     def start_round(self):
-        self.game.reset()
         self.game.deal_round()
         self.display.print_table()
 

@@ -1,6 +1,6 @@
 class Hand(object):
 
-    def __init__(self, cards=[], stake=10):
+    def __init__(self, cards=[], stake=0):
         self._cards = cards
         self._stake = stake
         self._finished = False

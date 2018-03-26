@@ -49,9 +49,9 @@ def get_winner(hand, dealer):
     p = aggregate(hand)
     d = aggregate(dealer.hand)
 
-    if p > 21:
+    if p > 21 or p < d <= 21:
         return dealer
-    elif d < p <= 21:
+    elif d > 21 or d < p <= 21:
         return hand
     else:
         return None
