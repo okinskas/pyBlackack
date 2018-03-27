@@ -66,8 +66,9 @@ class Game(object):
         ops.reward(self.player, self.dealer)
 
 # known issues:
-# dealer does not win straight away when player goes bust...
-#   dealer should auto-stick (does win regardless of end result though)
+
 # dd is broken
-# you can give a different action during the y/n question and it will continue
 # split not yet supported
+
+# post-fixes:
+# clean up cli display
